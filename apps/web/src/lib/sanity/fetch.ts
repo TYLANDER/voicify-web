@@ -1,4 +1,4 @@
-import { sanityClient } from './client';
+import { getSanityClient } from './client';
 
 /**
  * Fetch data from Sanity with ISR revalidation.
@@ -9,12 +9,11 @@ export async function sanityFetch<T>(
   params: Record<string, string> = {},
   revalidate = 60
 ): Promise<T | null> {
-  if (!process.env.NEXT_PUBLIC_SANITY_PROJECT_ID) {
-    return null;
-  }
+  const client = getSanityClient();
+  if (!client) return null;
 
   try {
-    const data = await sanityClient.fetch<T>(query, params, {
+    const data = await client.fetch<T>(query, params, {
       next: { revalidate },
     });
     return data ?? null;

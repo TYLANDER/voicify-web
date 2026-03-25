@@ -1,4 +1,4 @@
-import { createClient } from '@sanity/client';
+import { createClient, type SanityClient } from '@sanity/client';
 import imageUrlBuilder from '@sanity/image-url';
 import type { SanityImageSource } from '@sanity/image-url/lib/types/types';
 
@@ -9,20 +9,23 @@ export const sanityConfig = {
   useCdn: process.env.NODE_ENV === 'production',
 };
 
-export const sanityClient = createClient({
-  ...sanityConfig,
-  perspective: 'published',
-});
+let _client: SanityClient | null = null;
 
-export const previewClient = createClient({
-  ...sanityConfig,
-  useCdn: false,
-  perspective: 'previewDrafts',
-  token: process.env.SANITY_API_TOKEN,
-});
+export function getSanityClient(): SanityClient | null {
+  if (!sanityConfig.projectId) return null;
+  if (!_client) {
+    _client = createClient({ ...sanityConfig, perspective: 'published' });
+  }
+  return _client;
+}
 
-const builder = imageUrlBuilder(sanityClient);
+// Legacy export for backward compat — avoid using at module scope
+export const sanityClient = sanityConfig.projectId
+  ? createClient({ ...sanityConfig, perspective: 'published' })
+  : (null as unknown as SanityClient);
 
 export function urlFor(source: SanityImageSource) {
-  return builder.image(source);
+  const client = getSanityClient();
+  if (!client) return null;
+  return imageUrlBuilder(client).image(source);
 }
