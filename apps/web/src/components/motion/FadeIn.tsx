@@ -3,6 +3,7 @@
 import { type ReactNode } from 'react';
 import { motion, useReducedMotion, type Variants } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { EASINGS, DURATIONS } from '@/lib/motion';
 
 type Direction = 'up' | 'down' | 'left' | 'right' | 'none';
 
@@ -26,7 +27,7 @@ export function FadeIn({
   children,
   direction = 'up',
   delay = 0,
-  duration = 0.5,
+  duration = DURATIONS.medium,
   className,
 }: FadeInProps) {
   const shouldReduceMotion = useReducedMotion();
@@ -42,7 +43,7 @@ export function FadeIn({
       transition: {
         duration: shouldReduceMotion ? 0 : duration,
         delay: shouldReduceMotion ? 0 : delay,
-        ease: [0.22, 1, 0.36, 1],
+        ease: EASINGS.smooth,
       },
     },
   };
