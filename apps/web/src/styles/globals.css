@@ -133,12 +133,13 @@ body::before {
   background-clip: text;
 }
 
-/* Gradient text hero variant */
+/* Gradient text hero variant — brighter stops for readability */
 @utility gradient-text-hero {
-  background: linear-gradient(135deg, var(--color-accent-blue), var(--color-accent-violet));
+  background: linear-gradient(135deg, #60a5fa, #a78bfa, #818cf8);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  filter: drop-shadow(0 2px 8px rgba(96, 165, 250, 0.3));
 }
 
 /* Glow button utility */
