@@ -35,8 +35,8 @@ export function Header() {
         className={cn(
           'fixed top-0 right-0 left-0 z-50 transition-all',
           isScrolled
-            ? 'bg-bg-secondary/80 py-3 backdrop-blur-xl'
-            : 'bg-transparent py-5 backdrop-blur-sm'
+            ? 'bg-bg-secondary/95 py-3 backdrop-blur-xl'
+            : 'bg-bg-primary/80 py-5 backdrop-blur-md'
         )}
         style={{
           borderBottom: isScrolled
@@ -47,7 +47,7 @@ export function Header() {
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
-            <span className="gradient-text text-xl font-bold tracking-tight">Voicify</span>
+            <span className="gradient-text text-2xl font-bold tracking-tight">Voicify</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -62,7 +62,7 @@ export function Header() {
                 <button
                   type="button"
                   className={cn(
-                    'flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+                    'flex items-center gap-1 rounded-lg px-3 py-2 text-[15px] font-medium transition-colors',
                     'text-text-secondary hover:text-text-primary'
                   )}
                   aria-expanded={openDropdown === item.label}
@@ -103,7 +103,7 @@ export function Header() {
             <Link
               href={navigation.cta.href}
               className={cn(
-                'hidden rounded-full px-5 py-2 text-sm font-medium transition-all lg:inline-flex',
+                'hidden rounded-full px-6 py-2.5 text-[15px] font-semibold transition-all lg:inline-flex',
                 'bg-accent-blue glow-blue hover:bg-accent-blue/90 text-white'
               )}
             >
