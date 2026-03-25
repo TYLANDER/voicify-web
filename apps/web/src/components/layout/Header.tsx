@@ -77,21 +77,23 @@ export function Header() {
                   />
                 </button>
 
-                {/* Dropdown */}
+                {/* Dropdown — invisible bridge (pt-3) closes the gap so hover doesn't break */}
                 {openDropdown === item.label && (
-                  <div className="glass absolute top-full left-0 mt-1 min-w-[200px] rounded-xl p-2 shadow-lg">
-                    {item.children.map((child) => (
-                      <Link
-                        key={child.href}
-                        href={child.href}
-                        className={cn(
-                          'block rounded-lg px-3 py-2 text-sm transition-colors',
-                          'text-text-secondary hover:bg-bg-tertiary hover:text-text-primary'
-                        )}
-                      >
-                        {child.label}
-                      </Link>
-                    ))}
+                  <div className="absolute top-full left-0 pt-3">
+                    <div className="glass min-w-[220px] rounded-xl p-2 shadow-lg">
+                      {item.children.map((child) => (
+                        <Link
+                          key={child.href}
+                          href={child.href}
+                          className={cn(
+                            'block rounded-lg px-4 py-2.5 text-sm transition-colors',
+                            'text-text-secondary hover:bg-bg-tertiary hover:text-text-primary'
+                          )}
+                        >
+                          {child.label}
+                        </Link>
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>
