@@ -1,0 +1,55 @@
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import { FadeIn } from '@/components/motion/FadeIn';
+
+interface ArticlePageProps {
+  params: Promise<{ slug: string }>;
+}
+
+export async function generateMetadata({ params }: ArticlePageProps): Promise<Metadata> {
+  const { slug } = await params;
+  return {
+    title: slug
+      .split('-')
+      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(' '),
+  };
+}
+
+export default async function ArticlePage({ params }: ArticlePageProps) {
+  const { slug } = await params;
+
+  // Placeholder — will be replaced with Sanity fetch
+  const title = slug
+    .split('-')
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ');
+
+  return (
+    <main className="bg-bg-primary py-section px-6">
+      <article className="mx-auto max-w-3xl">
+        <FadeIn>
+          <Link href="/resources/articles" className="text-accent-blue text-sm hover:underline">
+            ← Back to Articles
+          </Link>
+          <h1 className="text-h1 text-text-primary mt-6 font-bold tracking-tight">{title}</h1>
+          <p className="text-text-muted mt-4">Published on January 1, 2024</p>
+        </FadeIn>
+
+        <FadeIn delay={0.1}>
+          <div className="text-text-secondary mt-12 space-y-6 text-lg leading-relaxed">
+            <p>
+              This article content will be loaded from Sanity CMS. The content management system
+              allows the Voicify team to create, edit, and publish articles with rich text, images,
+              and embedded media.
+            </p>
+            <p>
+              Configure your Sanity project ID and dataset in the environment variables to connect
+              this page to live CMS content.
+            </p>
+          </div>
+        </FadeIn>
+      </article>
+    </main>
+  );
+}
