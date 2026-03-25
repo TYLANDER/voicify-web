@@ -4,12 +4,19 @@ import { FeatureGrid } from '@/components/sections/FeatureGrid';
 import { CTABanner } from '@/components/sections/CTABanner';
 import { ComplianceBadges } from '@/components/sections/ComplianceBadges';
 import { FadeIn } from '@/components/motion/FadeIn';
+import { sanityFetch } from '@/lib/sanity/fetch';
+import { industryPageQuery } from '@/lib/sanity/queries';
+import type { IndustryPage } from '@/lib/sanity/types';
 
-export const metadata: Metadata = {
-  title: 'Hotels Voice AI',
-  description:
-    'The most advanced Voice AI Receptionist for Hotels. Elevate guest experience, streamline operations, and drive new revenue.',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const data = await sanityFetch<IndustryPage>(industryPageQuery, { slug: 'hotels' });
+  return {
+    title: data?.seo?.metaTitle ?? 'Hotels Voice AI',
+    description:
+      data?.seo?.metaDescription ??
+      'The most advanced Voice AI Receptionist for Hotels. Elevate guest experience, streamline operations, and drive new revenue.',
+  };
+}
 
 const features = [
   {
@@ -44,14 +51,21 @@ const features = [
   },
 ];
 
-export default function HotelsPage() {
+export default async function HotelsPage() {
+  const data = await sanityFetch<IndustryPage>(industryPageQuery, { slug: 'hotels' });
+
+  const resolvedFeatures = data?.solutions ?? features;
+
   return (
     <main>
       <Hero
-        heading="The most advanced Voice AI Receptionist for Hotels"
-        subheading="Elevate guest experience, streamline operations, & drive new revenue"
-        ctaText="Schedule a Meeting"
-        ctaLink="/schedule"
+        heading={data?.hero?.heading ?? 'The most advanced Voice AI Receptionist for Hotels'}
+        subheading={
+          data?.hero?.subheading ??
+          'Elevate guest experience, streamline operations, & drive new revenue'
+        }
+        ctaText={data?.hero?.ctaText ?? 'Schedule a Meeting'}
+        ctaLink={data?.hero?.ctaLink ?? '/schedule'}
         variant="industry"
       />
 
@@ -62,7 +76,7 @@ export default function HotelsPage() {
               Hotel Voice AI Solutions
             </h2>
           </FadeIn>
-          <FeatureGrid features={features} columns={3} />
+          <FeatureGrid features={resolvedFeatures} columns={3} />
         </div>
       </section>
 

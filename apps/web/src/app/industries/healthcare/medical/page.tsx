@@ -4,12 +4,19 @@ import { FeatureGrid } from '@/components/sections/FeatureGrid';
 import { CTABanner } from '@/components/sections/CTABanner';
 import { ComplianceBadges } from '@/components/sections/ComplianceBadges';
 import { FadeIn } from '@/components/motion/FadeIn';
+import { sanityFetch } from '@/lib/sanity/fetch';
+import { industryPageQuery } from '@/lib/sanity/queries';
+import type { IndustryPage } from '@/lib/sanity/types';
 
-export const metadata: Metadata = {
-  title: 'Medical Voice AI',
-  description:
-    'Voice AI solutions for medical practices. Automate patient communication, scheduling, and support while maintaining HIPAA compliance.',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const data = await sanityFetch<IndustryPage>(industryPageQuery, { slug: 'healthcare/medical' });
+  return {
+    title: data?.seo?.metaTitle ?? 'Medical Voice AI',
+    description:
+      data?.seo?.metaDescription ??
+      'Voice AI solutions for medical practices. Automate patient communication, scheduling, and support while maintaining HIPAA compliance.',
+  };
+}
 
 const features = [
   {
@@ -50,14 +57,21 @@ const features = [
   },
 ];
 
-export default function MedicalPage() {
+export default async function MedicalPage() {
+  const data = await sanityFetch<IndustryPage>(industryPageQuery, { slug: 'healthcare/medical' });
+
+  const resolvedFeatures = data?.solutions ?? features;
+
   return (
     <main>
       <Hero
-        heading="Voice AI for Medical Practices"
-        subheading="Automate patient communication while maintaining the highest security standards"
-        ctaText="Schedule a Meeting"
-        ctaLink="/schedule"
+        heading={data?.hero?.heading ?? 'Voice AI for Medical Practices'}
+        subheading={
+          data?.hero?.subheading ??
+          'Automate patient communication while maintaining the highest security standards'
+        }
+        ctaText={data?.hero?.ctaText ?? 'Schedule a Meeting'}
+        ctaLink={data?.hero?.ctaLink ?? '/schedule'}
         variant="industry"
       />
 
@@ -68,7 +82,7 @@ export default function MedicalPage() {
               Built for Healthcare
             </h2>
           </FadeIn>
-          <FeatureGrid features={features} columns={3} />
+          <FeatureGrid features={resolvedFeatures} columns={3} />
         </div>
       </section>
 

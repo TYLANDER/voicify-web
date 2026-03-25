@@ -3,14 +3,21 @@ import { Hero } from '@/components/sections/Hero';
 import { FeatureGrid } from '@/components/sections/FeatureGrid';
 import { CTABanner } from '@/components/sections/CTABanner';
 import { FadeIn } from '@/components/motion/FadeIn';
+import { sanityFetch } from '@/lib/sanity/fetch';
+import { productPageQuery } from '@/lib/sanity/queries';
+import type { ProductPage } from '@/lib/sanity/types';
 
-export const metadata: Metadata = {
-  title: 'Voice AI Reservations',
-  description:
-    'Provide courteous, self-service table reservations that never sleep. 24/7 availability with seamless scheduling.',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const data = await sanityFetch<ProductPage>(productPageQuery, { slug: 'reservations' });
+  return {
+    title: data?.seo?.metaTitle ?? 'Voice AI Reservations',
+    description:
+      data?.seo?.metaDescription ??
+      'Provide courteous, self-service table reservations that never sleep. 24/7 availability with seamless scheduling.',
+  };
+}
 
-const features = [
+const fallbackFeatures = [
   {
     icon: 'Clock',
     title: '24/7 Availability',
@@ -37,14 +44,25 @@ const features = [
   },
 ];
 
-export default function ReservationsPage() {
+export default async function ReservationsPage() {
+  const data = await sanityFetch<ProductPage>(productPageQuery, { slug: 'reservations' });
+
+  const heroHeading =
+    data?.hero?.heading ?? 'Provide courteous, self-service table reservations that never sleep';
+  const heroSubheading =
+    data?.hero?.subheading ??
+    '24/7 availability with intelligent scheduling and guest communication';
+  const heroCtaText = data?.hero?.ctaText ?? 'Book a Demo';
+  const heroCtaLink = data?.hero?.ctaLink ?? '/schedule';
+  const features = data?.features ?? fallbackFeatures;
+
   return (
     <main>
       <Hero
-        heading="Provide courteous, self-service table reservations that never sleep"
-        subheading="24/7 availability with intelligent scheduling and guest communication"
-        ctaText="Book a Demo"
-        ctaLink="/schedule"
+        heading={heroHeading}
+        subheading={heroSubheading}
+        ctaText={heroCtaText}
+        ctaLink={heroCtaLink}
         variant="product"
       />
 

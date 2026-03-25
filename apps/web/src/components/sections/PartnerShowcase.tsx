@@ -6,9 +6,11 @@ import { cn } from '@/lib/utils';
 
 interface Partner {
   name: string;
-  logo?: string;
+  logo?: unknown;
+  description?: string;
   quote?: string;
   quoteAuthor?: string;
+  website?: string;
   category: string;
 }
 
@@ -74,7 +76,7 @@ export function PartnerShowcase({ partners }: PartnerShowcaseProps) {
             <div key={partner.name} className="glass flex flex-col rounded-xl p-6">
               {/* Logo area */}
               <div className="mb-4 flex h-16 items-center">
-                {partner.logo ? (
+                {partner.logo && typeof partner.logo === 'string' ? (
                   <Image
                     src={partner.logo}
                     alt={partner.name}

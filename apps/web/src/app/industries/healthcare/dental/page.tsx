@@ -5,12 +5,19 @@ import { ValueProp } from '@/components/sections/ValueProp';
 import { CTABanner } from '@/components/sections/CTABanner';
 import { ComplianceBadges } from '@/components/sections/ComplianceBadges';
 import { FadeIn } from '@/components/motion/FadeIn';
+import { sanityFetch } from '@/lib/sanity/fetch';
+import { industryPageQuery } from '@/lib/sanity/queries';
+import type { IndustryPage } from '@/lib/sanity/types';
 
-export const metadata: Metadata = {
-  title: 'Dental Voice AI',
-  description:
-    'The Leading Voice AI Receptionist for Dental Practices. Answer every patient, every time they call.',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const data = await sanityFetch<IndustryPage>(industryPageQuery, { slug: 'healthcare/dental' });
+  return {
+    title: data?.seo?.metaTitle ?? 'Dental Voice AI',
+    description:
+      data?.seo?.metaDescription ??
+      'The Leading Voice AI Receptionist for Dental Practices. Answer every patient, every time they call.',
+  };
+}
 
 const valueProps = [
   {
@@ -59,20 +66,28 @@ const features = [
   },
 ];
 
-export default function DentalPage() {
+export default async function DentalPage() {
+  const data = await sanityFetch<IndustryPage>(industryPageQuery, { slug: 'healthcare/dental' });
+
+  const resolvedValueProps = data?.painPoints ?? valueProps;
+  const resolvedFeatures = data?.solutions ?? features;
+
   return (
     <main>
       <Hero
-        heading="The Leading Voice AI Receptionist for Dental Practices"
-        subheading="Answer every patient, every time they call — without disrupting face-to-face care"
-        ctaText="Schedule a Meeting"
-        ctaLink="/schedule"
+        heading={data?.hero?.heading ?? 'The Leading Voice AI Receptionist for Dental Practices'}
+        subheading={
+          data?.hero?.subheading ??
+          'Answer every patient, every time they call — without disrupting face-to-face care'
+        }
+        ctaText={data?.hero?.ctaText ?? 'Schedule a Meeting'}
+        ctaLink={data?.hero?.ctaLink ?? '/schedule'}
         variant="industry"
       />
 
       <section className="bg-bg-secondary py-section px-6">
         <div className="mx-auto max-w-7xl space-y-20">
-          {valueProps.map((prop, i) => (
+          {resolvedValueProps.map((prop, i) => (
             <ValueProp
               key={prop.title}
               icon={prop.icon}
@@ -91,9 +106,26 @@ export default function DentalPage() {
               Key Capabilities
             </h2>
           </FadeIn>
-          <FeatureGrid features={features} columns={2} />
+          <FeatureGrid features={resolvedFeatures} columns={2} />
         </div>
       </section>
+
+      {data?.testimonial && (
+        <section className="bg-bg-primary px-6 py-16">
+          <div className="mx-auto max-w-3xl text-center">
+            <FadeIn>
+              <blockquote className="text-text-primary text-xl leading-relaxed italic">
+                &ldquo;{data.testimonial.quote}&rdquo;
+              </blockquote>
+              <p className="text-text-muted mt-4 text-sm font-medium">
+                {data.testimonial.author}
+                {data.testimonial.role && `, ${data.testimonial.role}`}
+                {data.testimonial.company && ` at ${data.testimonial.company}`}
+              </p>
+            </FadeIn>
+          </div>
+        </section>
+      )}
 
       <section className="bg-bg-secondary px-6 py-16">
         <div className="mx-auto max-w-7xl">

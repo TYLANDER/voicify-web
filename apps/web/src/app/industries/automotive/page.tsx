@@ -4,12 +4,19 @@ import { FeatureGrid } from '@/components/sections/FeatureGrid';
 import { CTABanner } from '@/components/sections/CTABanner';
 import { ComplianceBadges } from '@/components/sections/ComplianceBadges';
 import { FadeIn } from '@/components/motion/FadeIn';
+import { sanityFetch } from '@/lib/sanity/fetch';
+import { industryPageQuery } from '@/lib/sanity/queries';
+import type { IndustryPage } from '@/lib/sanity/types';
 
-export const metadata: Metadata = {
-  title: 'Automotive Voice AI',
-  description:
-    'The leading Voice AI Customer Service Agent for the Automotive Industry. Elevate guest experience, streamline operations, and drive new revenue.',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const data = await sanityFetch<IndustryPage>(industryPageQuery, { slug: 'automotive' });
+  return {
+    title: data?.seo?.metaTitle ?? 'Automotive Voice AI',
+    description:
+      data?.seo?.metaDescription ??
+      'The leading Voice AI Customer Service Agent for the Automotive Industry. Elevate guest experience, streamline operations, and drive new revenue.',
+  };
+}
 
 const features = [
   {
@@ -44,14 +51,24 @@ const features = [
   },
 ];
 
-export default function AutomotivePage() {
+export default async function AutomotivePage() {
+  const data = await sanityFetch<IndustryPage>(industryPageQuery, { slug: 'automotive' });
+
+  const resolvedFeatures = data?.solutions ?? features;
+
   return (
     <main>
       <Hero
-        heading="The leading Voice AI Customer Service Agent for the Automotive Industry"
-        subheading="Elevate guest experience, streamline operations, & drive new revenue"
-        ctaText="Schedule a Meeting"
-        ctaLink="/schedule"
+        heading={
+          data?.hero?.heading ??
+          'The leading Voice AI Customer Service Agent for the Automotive Industry'
+        }
+        subheading={
+          data?.hero?.subheading ??
+          'Elevate guest experience, streamline operations, & drive new revenue'
+        }
+        ctaText={data?.hero?.ctaText ?? 'Schedule a Meeting'}
+        ctaLink={data?.hero?.ctaLink ?? '/schedule'}
         variant="industry"
       />
 
@@ -62,7 +79,7 @@ export default function AutomotivePage() {
               Voice AI Solutions for Automotive
             </h2>
           </FadeIn>
-          <FeatureGrid features={features} columns={3} />
+          <FeatureGrid features={resolvedFeatures} columns={3} />
         </div>
       </section>
 

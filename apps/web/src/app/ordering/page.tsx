@@ -5,14 +5,21 @@ import { ValueProp } from '@/components/sections/ValueProp';
 import { VideoEmbed } from '@/components/sections/VideoEmbed';
 import { CTABanner } from '@/components/sections/CTABanner';
 import { FadeIn } from '@/components/motion/FadeIn';
+import { sanityFetch } from '@/lib/sanity/fetch';
+import { productPageQuery } from '@/lib/sanity/queries';
+import type { ProductPage } from '@/lib/sanity/types';
 
-export const metadata: Metadata = {
-  title: 'Voice AI Ordering',
-  description:
-    'Restaurant Voice AI Ordering that simply works. Take complex orders with modifiers and changes accurately every time.',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const data = await sanityFetch<ProductPage>(productPageQuery, { slug: 'ordering' });
+  return {
+    title: data?.seo?.metaTitle ?? 'Voice AI Ordering',
+    description:
+      data?.seo?.metaDescription ??
+      'Restaurant Voice AI Ordering that simply works. Take complex orders with modifiers and changes accurately every time.',
+  };
+}
 
-const valueProps = [
+const fallbackValueProps = [
   {
     icon: 'ShoppingCart',
     title: 'Take complex orders with modifiers and changes',
@@ -33,7 +40,7 @@ const valueProps = [
   },
 ];
 
-const features = [
+const fallbackFeatures = [
   {
     icon: 'MessageSquare',
     title: 'Natural Conversation',
@@ -60,14 +67,25 @@ const features = [
   },
 ];
 
-export default function OrderingPage() {
+export default async function OrderingPage() {
+  const data = await sanityFetch<ProductPage>(productPageQuery, { slug: 'ordering' });
+
+  const heroHeading = data?.hero?.heading ?? 'Restaurant Voice AI Ordering That Simply Works';
+  const heroSubheading =
+    data?.hero?.subheading ??
+    'Take complex orders with modifiers and changes — accurately, every time';
+  const heroCtaText = data?.hero?.ctaText ?? 'Schedule a Meeting';
+  const heroCtaLink = data?.hero?.ctaLink ?? '/schedule';
+  const valueProps = data?.valueProps ?? fallbackValueProps;
+  const features = data?.features ?? fallbackFeatures;
+
   return (
     <main>
       <Hero
-        heading="Restaurant Voice AI Ordering That Simply Works"
-        subheading="Take complex orders with modifiers and changes — accurately, every time"
-        ctaText="Schedule a Meeting"
-        ctaLink="/schedule"
+        heading={heroHeading}
+        subheading={heroSubheading}
+        ctaText={heroCtaText}
+        ctaLink={heroCtaLink}
         variant="product"
       />
 
@@ -79,7 +97,10 @@ export default function OrderingPage() {
             </h2>
           </FadeIn>
           <FadeIn delay={0.2}>
-            <VideoEmbed url="" title="Voicify AI Ordering Demo" />
+            <VideoEmbed
+              url={data?.videoEmbed?.url ?? ''}
+              title={data?.videoEmbed?.title ?? 'Voicify AI Ordering Demo'}
+            />
           </FadeIn>
         </div>
       </section>

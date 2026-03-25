@@ -5,6 +5,8 @@ import { FeatureGrid } from '@/components/sections/FeatureGrid';
 import { CTABanner } from '@/components/sections/CTABanner';
 import { ComplianceBadges } from '@/components/sections/ComplianceBadges';
 import { FadeIn } from '@/components/motion/FadeIn';
+import { sanityFetch } from '@/lib/sanity/fetch';
+import { partnersQuery } from '@/lib/sanity/queries';
 
 export const metadata: Metadata = {
   title: 'Integrations & Partnerships',
@@ -12,7 +14,7 @@ export const metadata: Metadata = {
     'Voicify integrates with leading technology and ordering platforms. Better together.',
 };
 
-const techPartners = [
+const defaultTechPartners = [
   {
     name: 'Chowly',
     category: 'technology' as const,
@@ -42,7 +44,7 @@ const techPartners = [
   },
 ];
 
-const restaurantPartners = [
+const defaultRestaurantPartners = [
   { name: 'NORMS Restaurant Group', category: 'restaurant' as const },
   { name: 'Pure Green Franchise', category: 'restaurant' as const },
   { name: "T'so Chinese", category: 'restaurant' as const },
@@ -82,7 +84,23 @@ const capabilities = [
   },
 ];
 
-export default function IntegrationsPage() {
+export default async function IntegrationsPage() {
+  const cmsPartners =
+    await sanityFetch<
+      {
+        name: string;
+        category: string;
+        description?: string;
+        quote?: string;
+        quoteAuthor?: string;
+      }[]
+    >(partnersQuery);
+
+  const techPartners = cmsPartners ? cmsPartners.filter((p) => p.category === 'technology') : null;
+  const restaurantPartners = cmsPartners
+    ? cmsPartners.filter((p) => p.category === 'restaurant')
+    : null;
+
   return (
     <main>
       <Hero
@@ -91,6 +109,8 @@ export default function IntegrationsPage() {
         ctaText="Schedule a Meeting"
         ctaLink="/schedule"
         variant="default"
+        imageSrc="/images/integrations-hero.jpg"
+        imageAlt="Voicify integrations"
       />
 
       <section className="bg-bg-primary py-section px-6">
@@ -100,7 +120,9 @@ export default function IntegrationsPage() {
               Technology Partners
             </h2>
           </FadeIn>
-          <PartnerShowcase partners={techPartners} />
+          <PartnerShowcase
+            partners={techPartners && techPartners.length > 0 ? techPartners : defaultTechPartners}
+          />
         </div>
       </section>
 
@@ -111,7 +133,13 @@ export default function IntegrationsPage() {
               Restaurant Partners
             </h2>
           </FadeIn>
-          <PartnerShowcase partners={restaurantPartners} />
+          <PartnerShowcase
+            partners={
+              restaurantPartners && restaurantPartners.length > 0
+                ? restaurantPartners
+                : defaultRestaurantPartners
+            }
+          />
         </div>
       </section>
 

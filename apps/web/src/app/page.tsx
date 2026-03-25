@@ -43,6 +43,8 @@ export default function HomePage() {
         ctaText="Schedule a Meeting"
         ctaLink="/schedule"
         variant="default"
+        imageSrc="/images/homepage-hero.jpg"
+        imageAlt="Voicify Voice AI Platform"
       />
 
       {/* Industry Showcase */}

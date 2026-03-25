@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 
@@ -7,6 +8,8 @@ interface HeroProps {
   ctaText?: string;
   ctaLink?: string;
   variant?: 'default' | 'product' | 'industry';
+  imageSrc?: string;
+  imageAlt?: string;
 }
 
 const meshStyles: Record<HeroProps['variant'] & string, string> = {
@@ -24,17 +27,43 @@ const meshStyles: Record<HeroProps['variant'] & string, string> = {
   ].join(' '),
 };
 
-export function Hero({ heading, subheading, ctaText, ctaLink, variant = 'default' }: HeroProps) {
+export function Hero({
+  heading,
+  subheading,
+  ctaText,
+  ctaLink,
+  variant = 'default',
+  imageSrc,
+  imageAlt,
+}: HeroProps) {
   return (
     <section
       className={cn(
         'relative flex min-h-[80vh] flex-col items-center justify-center overflow-hidden px-6 py-32 text-center',
-        // Gradient mesh layers via pseudo-elements
+        // Gradient mesh layers via pseudo-elements (shown when no image, or as overlay tint with image)
         'before:pointer-events-none before:absolute before:inset-0 before:animate-pulse before:[animation-duration:8s]',
         'after:pointer-events-none after:absolute after:inset-0 after:animate-pulse after:[animation-duration:12s]',
         meshStyles[variant]
       )}
     >
+      {/* Background image with dark overlay for text readability */}
+      {imageSrc && (
+        <>
+          <Image
+            src={imageSrc}
+            alt={imageAlt ?? ''}
+            fill
+            className="object-cover"
+            priority
+            sizes="100vw"
+          />
+          <div
+            className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/80"
+            aria-hidden="true"
+          />
+        </>
+      )}
+
       <div className="relative z-10 mx-auto max-w-4xl">
         <h1
           className="gradient-text-hero font-bold tracking-tight"

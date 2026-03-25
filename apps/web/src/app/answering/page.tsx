@@ -5,14 +5,21 @@ import { ValueProp } from '@/components/sections/ValueProp';
 import { VideoEmbed } from '@/components/sections/VideoEmbed';
 import { CTABanner } from '@/components/sections/CTABanner';
 import { FadeIn } from '@/components/motion/FadeIn';
+import { sanityFetch } from '@/lib/sanity/fetch';
+import { productPageQuery } from '@/lib/sanity/queries';
+import type { ProductPage } from '@/lib/sanity/types';
 
-export const metadata: Metadata = {
-  title: 'Voice AI Answering',
-  description:
-    'Give every caller a friendly welcome with Voicify AI Answering. Automated voice and SMS guest service that never misses a call.',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const data = await sanityFetch<ProductPage>(productPageQuery, { slug: 'answering' });
+  return {
+    title: data?.seo?.metaTitle ?? 'Voice AI Answering',
+    description:
+      data?.seo?.metaDescription ??
+      'Give every caller a friendly welcome with Voicify AI Answering. Automated voice and SMS guest service that never misses a call.',
+  };
+}
 
-const valueProps = [
+const fallbackValueProps = [
   {
     icon: 'Phone',
     title: 'Answer. Always.',
@@ -33,7 +40,7 @@ const valueProps = [
   },
 ];
 
-const features = [
+const fallbackFeatures = [
   {
     icon: 'Brain',
     title: 'Natural Language Understanding',
@@ -60,14 +67,25 @@ const features = [
   },
 ];
 
-export default function AnsweringPage() {
+export default async function AnsweringPage() {
+  const data = await sanityFetch<ProductPage>(productPageQuery, { slug: 'answering' });
+
+  const heroHeading =
+    data?.hero?.heading ?? 'Give Every Caller a Friendly Welcome with Voicify AI Answering';
+  const heroSubheading =
+    data?.hero?.subheading ?? 'Raise the bar on service, without more headcount';
+  const heroCtaText = data?.hero?.ctaText ?? 'Schedule a Meeting';
+  const heroCtaLink = data?.hero?.ctaLink ?? '/schedule';
+  const valueProps = data?.valueProps ?? fallbackValueProps;
+  const features = data?.features ?? fallbackFeatures;
+
   return (
     <main>
       <Hero
-        heading="Give Every Caller a Friendly Welcome with Voicify AI Answering"
-        subheading="Raise the bar on service, without more headcount"
-        ctaText="Schedule a Meeting"
-        ctaLink="/schedule"
+        heading={heroHeading}
+        subheading={heroSubheading}
+        ctaText={heroCtaText}
+        ctaLink={heroCtaLink}
         variant="product"
       />
 
@@ -80,7 +98,10 @@ export default function AnsweringPage() {
             </h2>
           </FadeIn>
           <FadeIn delay={0.2}>
-            <VideoEmbed url="" title="Voicify AI Answering Demo" />
+            <VideoEmbed
+              url={data?.videoEmbed?.url ?? ''}
+              title={data?.videoEmbed?.title ?? 'Voicify AI Answering Demo'}
+            />
           </FadeIn>
         </div>
       </section>

@@ -3,13 +3,16 @@ import Link from 'next/link';
 import { Hero } from '@/components/sections/Hero';
 import { FadeIn } from '@/components/motion/FadeIn';
 import { StaggerChildren } from '@/components/motion/StaggerChildren';
+import { sanityFetch } from '@/lib/sanity/fetch';
+import { articlesListQuery } from '@/lib/sanity/queries';
+import type { Article } from '@/lib/sanity/types';
 
 export const metadata: Metadata = {
   title: 'Articles',
   description: 'Stay updated on Voice AI news, insights, and best practices from the Voicify team.',
 };
 
-// Placeholder articles — will be replaced with Sanity data
+// Placeholder articles — used as fallback when Sanity is unconfigured
 const placeholderArticles = [
   {
     slug: 'voice-ai-restaurant-industry',
@@ -35,7 +38,20 @@ const placeholderArticles = [
   },
 ];
 
-export default function ArticlesPage() {
+export default async function ArticlesPage() {
+  const cmsArticles = await sanityFetch<Article[]>(articlesListQuery, {}, 30);
+
+  const articles =
+    cmsArticles && cmsArticles.length > 0
+      ? cmsArticles.map((a) => ({
+          slug: a.slug.current,
+          title: a.title,
+          excerpt: a.excerpt ?? '',
+          publishedAt: a.publishedAt,
+          categories: a.categories ?? [],
+        }))
+      : placeholderArticles;
+
   return (
     <main>
       <Hero
@@ -47,7 +63,7 @@ export default function ArticlesPage() {
       <section className="bg-bg-primary py-section px-6">
         <div className="mx-auto max-w-7xl">
           <StaggerChildren className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {placeholderArticles.map((article) => (
+            {articles.map((article) => (
               <Link
                 key={article.slug}
                 href={`/resources/articles/${article.slug}`}

@@ -4,12 +4,19 @@ import { FeatureGrid } from '@/components/sections/FeatureGrid';
 import { CTABanner } from '@/components/sections/CTABanner';
 import { ComplianceBadges } from '@/components/sections/ComplianceBadges';
 import { FadeIn } from '@/components/motion/FadeIn';
+import { sanityFetch } from '@/lib/sanity/fetch';
+import { industryPageQuery } from '@/lib/sanity/queries';
+import type { IndustryPage } from '@/lib/sanity/types';
 
-export const metadata: Metadata = {
-  title: 'Restaurant Voice AI',
-  description:
-    'Restaurants with Voicify AI experience a 2-3x increase in answered calls, translating to more orders, reservations, and business growth.',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const data = await sanityFetch<IndustryPage>(industryPageQuery, { slug: 'restaurants' });
+  return {
+    title: data?.seo?.metaTitle ?? 'Restaurant Voice AI',
+    description:
+      data?.seo?.metaDescription ??
+      'Restaurants with Voicify AI experience a 2-3x increase in answered calls, translating to more orders, reservations, and business growth.',
+  };
+}
 
 const features = [
   {
@@ -50,14 +57,21 @@ const features = [
   },
 ];
 
-export default function RestaurantsPage() {
+export default async function RestaurantsPage() {
+  const data = await sanityFetch<IndustryPage>(industryPageQuery, { slug: 'restaurants' });
+
+  const resolvedFeatures = data?.solutions ?? features;
+
   return (
     <main>
       <Hero
-        heading="Voice AI Built for Restaurants"
-        subheading="2-3x increase in answered calls — more orders, more reservations, more growth"
-        ctaText="Schedule a Meeting"
-        ctaLink="/schedule"
+        heading={data?.hero?.heading ?? 'Voice AI Built for Restaurants'}
+        subheading={
+          data?.hero?.subheading ??
+          '2-3x increase in answered calls — more orders, more reservations, more growth'
+        }
+        ctaText={data?.hero?.ctaText ?? 'Schedule a Meeting'}
+        ctaLink={data?.hero?.ctaLink ?? '/schedule'}
         variant="industry"
       />
 
@@ -68,7 +82,7 @@ export default function RestaurantsPage() {
               The Complete Voice AI Solution for Restaurants
             </h2>
           </FadeIn>
-          <FeatureGrid features={features} columns={3} />
+          <FeatureGrid features={resolvedFeatures} columns={3} />
         </div>
       </section>
 

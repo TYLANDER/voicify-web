@@ -3,6 +3,9 @@ import Link from 'next/link';
 import { Hero } from '@/components/sections/Hero';
 import { FadeIn } from '@/components/motion/FadeIn';
 import { StaggerChildren } from '@/components/motion/StaggerChildren';
+import { sanityFetch } from '@/lib/sanity/fetch';
+import { eventsListQuery } from '@/lib/sanity/queries';
+import type { Event } from '@/lib/sanity/types';
 
 export const metadata: Metadata = {
   title: 'Events',
@@ -37,7 +40,19 @@ const placeholderEvents = [
   },
 ];
 
-export default function EventsPage() {
+export default async function EventsPage() {
+  const cmsEvents = await sanityFetch<Event[]>(eventsListQuery, {}, 30);
+
+  const events =
+    cmsEvents && cmsEvents.length > 0
+      ? cmsEvents.map((e) => ({
+          slug: e.slug.current,
+          title: e.title,
+          dates: e.dates,
+          location: e.location,
+        }))
+      : placeholderEvents;
+
   return (
     <main>
       <Hero
@@ -49,7 +64,7 @@ export default function EventsPage() {
       <section className="bg-bg-primary py-section px-6">
         <div className="mx-auto max-w-4xl">
           <StaggerChildren className="space-y-6">
-            {placeholderEvents.map((event) => (
+            {events.map((event) => (
               <Link
                 key={event.slug}
                 href={`/resources/events/${event.slug}`}

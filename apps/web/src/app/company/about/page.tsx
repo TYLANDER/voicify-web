@@ -18,6 +18,8 @@ export default function AboutPage() {
         heading="About Voicify"
         subheading="Reimagining the phone call with Voice AI"
         variant="default"
+        imageSrc="/images/about-hero.jpg"
+        imageAlt="About Voicify"
       />
 
       <section className="bg-bg-primary py-section px-6">
